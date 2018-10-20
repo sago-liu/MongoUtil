@@ -51,18 +51,18 @@ class MongoUtil
     private static $serverConfig = array(
         'username' => '',
         'password' => '',
-        'ip' => '',
-        'port' => ''
+        'host' => '' // ip:port or ip1:port1,ip2:port2,ip3:port3
     );
 
     /**
      * @param $db
      * @param $collection
      * @param int $version
+     * @param bool $repSet
      * @return MongoCollection|MongodbCollection
      * @throws MongoConnectionException
      */
-    public static function getInstance($db, $collection, $version = self::VERSION_MONGO) {
+    public static function getInstance($db, $collection, $version = self::VERSION_MONGO, $repSet = false) {
         if (self::$instance) {
             return self::$instance;
         }
@@ -71,10 +71,20 @@ class MongoUtil
 
         switch ($version) {
             case self::VERSION_MONGO:
-                self::$instance = new MongoClient($server, $options = array("connect" => TRUE), $driver_options = array());
+                $options = array();
+                $repSet && $options = array(
+                    'readPreference' => MongoClient::RP_NEAREST,
+                    'w' => 'majority'
+                );
+                self::$instance = new MongoClient($server, $options);
                 break;
             case self::VERSION_MONGODB:
-                self::$instance = new MongodbClient($server);
+                $uriOptions = array();
+                $repSet && $uriOptions = array(
+                    'readPreference' => MongoDB\Driver\ReadPreference::RP_NEAREST,
+                    'w' => MongoDB\Driver\WriteConcern::MAJORITY
+                );
+                self::$instance = new MongodbClient($server, $uriOptions);
                 break;
         }
 
@@ -87,10 +97,9 @@ class MongoUtil
     private static function getServer() {
         $username = self::$serverConfig['username'];
         $password = self::$serverConfig['password'];
-        $ip = self::$serverConfig['ip'];
-        $port = self::$serverConfig['port'];
-        if (!empty($username) && !empty($password) && !empty($ip) && !empty($port)) {
-            $server = "mongodb://$username:$password@$ip:$port";
+        $host = self::$serverConfig['host'];
+        if (!empty($username) && !empty($password) && !empty($host)) {
+            $server = "mongodb://$username:$password@$host";
         } else {
             $server = "mongodb://localhost:27017";
         }

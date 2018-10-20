@@ -15,9 +15,10 @@ class MongodbClient
     /**
      * MongodbClient constructor.
      * @param $server
+     * @param array $uriOptions
      */
-    public function __construct($server) {
-        $this->instance['conn'] = new MongoDB\Driver\Manager($server);
+    public function __construct($server, $uriOptions = array()) {
+        $this->instance['conn'] = new MongoDB\Driver\Manager($server, $uriOptions);
     }
 
     /**
