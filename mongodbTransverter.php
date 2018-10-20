@@ -269,7 +269,7 @@ class MongodbCursor implements Iterator
 
         self::$sortRule = $rule;
         usort($this->list, array('MongodbCursor', 'cmp'));
-        return $this->list;
+        return $this;
     }
 
     /**
@@ -279,6 +279,12 @@ class MongodbCursor implements Iterator
      */
     public function skip($num) {
         $num = intval($num);
+
+        $cnt = count($this->list);
+        if ($num >= $cnt) {
+            $this->origin = $cnt;
+            return $this;
+        }
 
         $this->origin = $num;
         return $this;
@@ -291,6 +297,12 @@ class MongodbCursor implements Iterator
      */
     public function limit($num) {
         $num = intval($num);
+
+        $cnt = count($this->list);
+        if ($this->origin + $num > $cnt) {
+            $this->destination = $cnt;
+            return $this;
+        }
 
         $this->destination = $this->origin + $num;
         return $this;
