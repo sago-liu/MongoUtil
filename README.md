@@ -78,3 +78,29 @@ foreach ($cursor as $doc) {
 ```
 
 For more usage, please read the test cases.
+
+#### Appendix: MongoUtil's short mongo id
+
+- native mongo id (length: 24)
+
+time stamp(4 bytes) + machine code(3 bytes) + PID(2 bytes) + counter(3 bytes)
+
+base：16
+
+- native mongo id with lossless compression (length: 16)
+
+time stamp(4 bytes) + machine code(3 bytes) + PID(2 bytes) + counter(3 bytes)
+
+base：64
+
+- approximate mongo id (length: 14)
+
+time stamp(4 bytes) + machine code(4 bytes) + random number(2 bytes)
+
+base：64
+
+- approximate mongo id (length: 8)
+
+time stamp(4 bytes) + random number(2 bytes)
+
+base：64
