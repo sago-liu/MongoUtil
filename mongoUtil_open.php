@@ -64,7 +64,7 @@ class MongoUtil
      */
     public static function getInstance($db, $collection, $version = self::VERSION_MONGO, $repSet = false) {
         if (self::$instance) {
-            return self::$instance;
+            return self::$instance->$db->$collection;
         }
 
         $server = self::getServer();
@@ -126,7 +126,7 @@ class MongoUtil
     }
 
     /**
-     * @param $long
+     * @param $len
      * @return null|string|string[]
      */
     public static function shortMongoId($len) {
